@@ -36,6 +36,14 @@ for (let i = 0; i < 3; i++) {
     '|', board[i * 3 + 2] || ' ', '|')
 }
 
+/*Result:
+Packed game 799002 = 11000011000100011010
+| o | x | o |
+| o | x | x |
+|   | o | x |
+*/
+
+
 /*
  * Takes two versions of the same game
  * and returns the one with the most moves.
@@ -43,7 +51,7 @@ for (let i = 0; i < 3; i++) {
  * unrelated game-sessions.
  */
 function merge (a, b) {
-  let backup = backup
+  let backup = b
   // swap if necessary so that A <= B
   if (a > b) {
     b = a
