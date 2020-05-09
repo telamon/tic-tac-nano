@@ -13,14 +13,6 @@
 //           0  1  2  3  4  5  6  7  8
 const BPM = [2, 3, 3, 3, 3, 2, 2, 1] // bits-per-move
 
-/*Result:
-Packed game 799002 = 11000011000100011010
-| o | x | o |
-| o | x | x |
-|   | o | x |
-*/
-
-
 /*
  * Takes two versions of the same game
  * and returns the one with the most moves.
