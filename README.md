@@ -10,7 +10,7 @@ the _full history_ of a Tic-tac-toe game session occupying only 20bits of binary
 I want to use it as an ultralight functional dummy for in-memory P2P simulations,
 if you find any other use-cases please share!
 
-(It is essentially a tiny finite append-only feed that in a test environment should adhere to similar constraints as the [real deal](mafintosh/hypercore))
+(It is essentially a tiny finite append-only feed that in a test environment should adhere to similar constraints as the [real deal](https://github.com/mafintosh/hypercore))
 
 Example: Number `799002` contains 8 moves and ends in a draw that looks like this
 when unpacked:
