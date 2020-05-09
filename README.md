@@ -7,11 +7,6 @@
 This is a [Conflict-free Replicated Data Type](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) that is capable of storing
 the _full history_ of a Tic-tac-toe game session occupying only 20bits of binary space.
 
-I want to use it as an ultralight functional dummy for in-memory P2P simulations,
-if you find any other use-cases please share!
-
-(It is essentially a tiny finite append-only feed that in a test environment should adhere to similar constraints as the [real deal](https://github.com/mafintosh/hypercore))
-
 Example: Number `799002` contains 8 moves and ends in a draw that looks like this
 when unpacked:
 ```
@@ -20,6 +15,9 @@ when unpacked:
 | |o|x|
 ```
 
+I want to use it as an functional dummy for P2P simulations,
+if you find any other use-cases please share!
+(Essentially it is a tiny finite append-only feed that in a test environment should adhere to similar constraints as the [real deal](https://github.com/mafintosh/hypercore))
 
 ## Use
 
