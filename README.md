@@ -34,11 +34,8 @@ const {
     */
   unpackBoard,
   /**
-    * Packs a new move by index into argument feed
-    * optional 3rd argument causes packMove to log a
-    * visualization using console.info()
-
-    * packMove(feed, index, print = false) // => new version
+    * Packs a new move by index into argument feed.
+    * packMove(feed, index) // => new version
     */
   packMove,
   /**
