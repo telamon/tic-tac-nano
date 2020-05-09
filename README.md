@@ -45,11 +45,6 @@ const {
     * merge(a, b) // => a <=> b || UnrelatedGameError
     */
   merge,
-  /**
-    * Just as it sounds
-    *
-    * printFullGame(Number)
-    */
   printFullGame,
   nMoves,
   printBoard
