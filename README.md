@@ -4,6 +4,23 @@
 
 > 20bit CRDT Tic-Tac-Toe
 
+This is a [Conflict-free Replicated Data Type](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) that is capable of storing
+the _full history_ of a Tic-tac-toe game session occupying only 20bits of binary space.
+
+I want to use it as an ultralight functional dummy for in-memory P2P simulations,
+if you find any other use-cases please share!
+
+(It is essentially a tiny finite append-only feed that in a test environment should adhere to similar constraints as the [real deal](mafintosh/hypercore))
+
+Example: Number `799002` contains 8 moves and ends in a draw that looks like this
+when unpacked:
+```
+|o|x|o|
+|o|x|x|
+| |o|x|
+```
+
+
 ## Use
 
 ```bash
@@ -11,8 +28,134 @@ $ npm install tic-tac-nano
 ```
 
 ```js
-const mod = require('tic-tac-nano')
-mod.doMagic() // => Result
+const {
+  /**
+    * Unpacks the feed bits into an array
+    *
+    * unpackBoard(feed) // => ['x','o',undefined, ...]
+    */
+  unpackBoard,
+  /**
+    * Packs a new move by index into argument feed
+    * optional 3rd argument causes packMove to log a
+    * visualization using console.info()
+
+    * packMove(feed, index, print = false) // => new version
+    */
+  packMove,
+  /**
+    * Return longest feed of the two or throws an error
+    * if there is no overlap between the two histories.
+    *
+    * merge(a, b) // => a <=> b || UnrelatedGameError
+    */
+  merge,
+  /**
+    * Just as it sounds
+    *
+    * printFullGame(Number)
+    */
+  printFullGame,
+  nMoves,
+  printBoard
+} = require('tic-tac-nano')
+
+// Alice puts an `x` in the center and sends the feed to bob
+let alice = packMove(0, 2) // => 2
+
+// Bob places an `o` in top-left corner and sends the feed
+// back to alice
+let bob = packMove(alice, 0) // => 48
+
+// They continue to send the feed back and forth
+// until the game ends in a draw.
+alice = packMove(bob, 6) // => 390
+bob = packMove(alice, 1) // => 3121
+alice = packMove(bob, 0) // => ...
+bob = packMove(alice, 3) // => ...
+alice = packMove(bob, 1) // => ...
+bob = packMove(alice, 0) // => 79902
+```
+
+**Now we can print the entire history**
+
+```
+> printFullGame(79902)
+
+Move #1
+| | | |
+| |x| |
+| | | |
+
+Move #2
+|o| | |
+| |x| |
+| | | |
+
+Move #3
+|o| | |
+| |x| |
+| | |x|
+
+Move #4
+|o| |o|
+| |x| |
+| | |x|
+
+Move #5
+|o|x|o|
+| |x| |
+| | |x|
+
+Move #6
+|o|x|o|
+| |x| |
+| |o|x|
+
+Move #7
+|o|x|o|
+| |x|x|
+| |o|x|
+
+Move #8
+|o|x|o|
+|o|x|x|
+| |o|x|
+```
+
+## Move Indices
+
+First move only has 3 choices:
+
+```
+| 0 | 1 |   |    0: Corner
+|---+---+---|    1: Edge
+|   | 2 |   |    2: Center
+|---+---+---|
+|   |   |   |
+```
+
+Subsequent moves use index numbers from left-to-right, up-to-down,
+skipping over any occupied slots.
+
+Ex1.
+
+```
+| 0 | x | 1 |
+|---+---+---|
+| 2 | 3 | 4 |
+|---+---+---|
+| o | 5 | 6 |
+```
+
+Ex2.
+
+```
+| 0 | x | 1 |
+|---+---+---|
+| 2 | x | 3 |
+|---+---+---|
+| o | 4 | 5 |
 ```
 
 ## Donations
@@ -36,7 +179,7 @@ I will from now on provide documentation relational to project activity.
  |  - Open an issue if you have ANY questions! :)  |
  |  - Star this repo if you found it interesting   |
  |  - Fork off & help document <3                  |
- |.________________________________________________|
+ |.________________________/________________________|
 
 I publish all of my work as Libre software and will continue to do so,
 drop me a penny at Patreon to help fund experiments like these.
@@ -49,7 +192,12 @@ Telegram: https://t.me/decentlabs_se
 
 ## Changelog
 
-### 0.1.0 first release
+### 1.0.0
+- added methods packMove, nMoves, printFullGame
+- added tests
+- populated README.md
+### 0.1.0
+- first release
 
 ## Contributing
 

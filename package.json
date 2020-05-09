@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/telamon/tic-tac-nano"
   },
-  "homepage": "https://github.com/telamon/tic-tac-nano"
+  "homepage": "https://github.com/telamon/tic-tac-nano",
+  "devDependencies": {
+    "standard": "^14.3.3",
+    "tape": "^5.0.0"
+  }
 }

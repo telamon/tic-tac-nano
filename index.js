@@ -9,32 +9,9 @@
  *
  */
 
-// Demo game session:
-
-let game = 1 // Start bit.
-game = (game << 2) | 2 // Place X in middle
-game = (game << 3) | 0 // Place O in corner
-game = (game << 3) | 6 // Place X opposite corner
-game = (game << 3) | 1 // Place O top right corner
-game = (game << 3) | 0 // X blocks on edge
-game = (game << 2) | 3 // O blocks vertical middle
-game = (game << 2) | 1 // Place X on right edge
-game = (game << 1) | 0 // O blocks
-
-// Game Over: draw!
-
-console.log('Packed game', game, '=', game.toString(2))
-
-// Unpack board
-const board = unpackBoard(game)
-
-// Print board
-for (let i = 0; i < 3; i++) {
-  console.log(
-    '|', board[i * 3] || ' ',
-    '|', board[i * 3 + 1] || ' ',
-    '|', board[i * 3 + 2] || ' ', '|')
-}
+// Due to symmetry first move only has 2bits
+//           0  1  2  3  4  5  6  7  8
+const BPM = [2, 3, 3, 3, 3, 2, 2, 1] // bits-per-move
 
 /*
  * Takes two versions of the same game
@@ -43,7 +20,7 @@ for (let i = 0; i < 3; i++) {
  * unrelated game-sessions.
  */
 function merge (a, b) {
-  let backup = backup
+  let backup = b
   // swap if necessary so that A <= B
   if (a > b) {
     b = a
@@ -52,16 +29,13 @@ function merge (a, b) {
   }
   // Align B to A
   while (a < b) b >>= 1
-  if (a !== b) throw new Error('UnrelatedGameSessions')
+  if (a !== b) throw new Error('UnrelatedGameError')
   return backup
 }
 
 // Unpacks a Number into a 3 by 3 board with crosses
 // and noughts.
-function unpackBoard (x) {
-  // Due to symmetry first move only has 2bits
-  //           0  1  2  3  4  5  6  7  8
-  const bpm = [2, 3, 3, 3, 3, 2, 2, 1] // bits-per-move
+function unpackBoard (x, maxMove = 8) {
   const board = []
   let markerFound = false
   let o = 0 // output bit offset
@@ -70,11 +44,13 @@ function unpackBoard (x) {
   for (let j = 20; j >= 0; j--) {
     const bit = (x >> j) & 1
     // Skip bits until we find the tail-bit marker
-    if (!markerFound && bit) { markerFound = true; continue }
-    if (!markerFound) continue
+    if (!markerFound) {
+      if (bit) markerFound = true
+      continue
+    }
 
-    n |= bit << (bpm[move] - ++o)
-    if (bpm[move] > o) continue // buffering
+    n |= bit << (BPM[move] - ++o)
+    if (BPM[move] > o) continue // buffering
     if (!move) {
       if (n & 0b10) board[4] = 'x'
       else board[n] = 'x'
@@ -85,7 +61,52 @@ function unpackBoard (x) {
       board[p] = move % 2 ? 'o' : 'x'
     }
     n = o = 0
+    if (move === maxMove) return board
     move++
   }
   return board
+}
+
+function nMoves (game) {
+  let i = 0
+  while (game && game !== 1) game >>>= BPM[i++]
+  if (i > 9) throw new Error('InvalidNumberOfEntries')
+  return i
+}
+
+function packMove (game, idx) {
+  game = game || 1
+  const i = nMoves(game)
+  return (game << BPM[i]) | idx
+}
+
+// Print board
+function printBoard (board) {
+  const rows = []
+  for (let i = 0; i < 3; i++) {
+    rows.push([
+      '|', board[i * 3] || ' ',
+      '|', board[i * 3 + 1] || ' ',
+      '|', board[i * 3 + 2] || ' ', '|'
+    ].join(''))
+  }
+  console.log(rows.join('\n'))
+}
+function printFullGame (game) {
+  const n = nMoves(game)
+  for (let i = 0; i < n; i++) {
+    const board = unpackBoard(game, i)
+    console.log(`Move #${i + 1}`)
+    printBoard(board)
+    console.log('')
+  }
+}
+
+module.exports = {
+  BPM,
+  merge,
+  unpackBoard,
+  packMove,
+  nMoves,
+  printFullGame
 }
